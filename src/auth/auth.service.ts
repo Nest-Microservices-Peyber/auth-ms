@@ -104,4 +104,21 @@ export class AuthService extends PrismaClient implements OnModuleInit{
         }
     }
 
+    async verifyToken(token: string) {
+        try {
+            const {sub, iat, exp, ...user} = this.jwtService.verify(token, {
+                secret: process.env.JWT_SECRET
+            });
+            return {
+                user: user,
+                token: await this.signJWT(user),
+            };
+        } catch (error) {
+            throw new RpcException({
+                code: 400,
+                message: error.message
+            });
+        }
+    }
+
 }
